@@ -1,36 +1,22 @@
 package locusway.colorfulhealthbar.proxy;
 
-import locusway.colorfulhealthbar.EventConfigChanged;
 import locusway.colorfulhealthbar.ColorfulHealthBar;
-import locusway.colorfulhealthbar.overlay.OverlayEventHandler;
+import locusway.colorfulhealthbar.EventConfigChanged;
 import locusway.colorfulhealthbar.overlay.HealthBarRenderer;
+import locusway.colorfulhealthbar.overlay.OverlayEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class ClientProxy extends CommonProxy
 {
     private static HealthBarRenderer healthBarRenderer;
-
-    @Override
-    public void preInit(FMLPreInitializationEvent event)
-    {
-        super.preInit(event);
-    }
-
-    @Override
-    public void init(FMLInitializationEvent event)
-    {
-        super.init(event);
-    }
 
     @Override
     public void postInit(FMLPostInitializationEvent event)

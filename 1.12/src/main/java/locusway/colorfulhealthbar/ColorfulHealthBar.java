@@ -14,7 +14,7 @@ public class ColorfulHealthBar
 
     public static final String MODID = "colorfulhealthbar";
     public static final String MODNAME = "Colorful Health Bar";
-    public static final String MODVERSION = "0.0.1a";
+    public static final String MODVERSION = "@VERSION@";
 
     @SidedProxy(clientSide = "locusway.colorfulhealthbar.proxy.ClientProxy", serverSide = "locusway.colorfulhealthbar.proxy.ServerProxy")
     public static CommonProxy proxy;
@@ -35,13 +35,6 @@ public class ColorfulHealthBar
 			logger.error("Health bar will not display correctly.");
         }
 
-        proxy.preInit(event);
-    }
-
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event)
-    {
-        proxy.init(event);
     }
 
     @Mod.EventHandler

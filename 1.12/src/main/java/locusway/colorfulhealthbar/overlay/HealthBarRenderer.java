@@ -15,6 +15,9 @@ import net.minecraftforge.client.GuiIngameForge;
 
 import java.util.Random;
 
+import static locusway.colorfulhealthbar.ModConfig.healthColorValues;
+import static locusway.colorfulhealthbar.ModConfig.textScale;
+
 /*
     Class handles the drawing of the health bar
  */
@@ -48,7 +51,7 @@ public class HealthBarRenderer {
 	private boolean forceUpdateIcons = false;
 
 	public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height) {
-		Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(x, y, textureX, textureY, width, height);
+		mc.ingameGUI.drawTexturedModalRect(x, y, textureX, textureY, width, height);
 	}
 
 	public HealthBarRenderer(Minecraft mc) {
@@ -85,7 +88,7 @@ public class HealthBarRenderer {
 		}
 		int absorb = MathHelper.ceil(entityplayer.getAbsorptionAmount());
 		if (health != playerHealth || absorbIcons == null || healthIcons == null || forceUpdateIcons) {
-			healthIcons = IconStateCalculator.calculateIcons(health, ModConfig.healthColorValues);
+			healthIcons = IconStateCalculator.calculateIcons(health, healthColorValues);
 			absorbIcons = IconStateCalculator.calculateIcons(absorb, ModConfig.absorptionColorValues);
 			forceUpdateIcons = false;
 		}
@@ -107,7 +110,7 @@ public class HealthBarRenderer {
 		mc.mcProfiler.startSection("health");
 
 		for (int i = 9; i >= 0; --i) {
-			healthIcons = IconStateCalculator.calculateIcons(health, ModConfig.healthColorValues);
+			healthIcons = IconStateCalculator.calculateIcons(health, healthColorValues);
 			Icon icon = healthIcons[i];
 			IconColor firstHalfColor = icon.primaryIconColor;
 			IconColor secondHalfColor = icon.secondaryIconColor;
@@ -240,8 +243,7 @@ public class HealthBarRenderer {
 				//Reset back to normal settings
 				mc.getTextureManager().bindTexture(ICON_VANILLA);
 				if (k5 != 16)potionEffects(xPosition,yPosition,k5,i, health);
-				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
+				GlStateManager.color(1, 1, 1, 1);
 			}
 		}
 		if (absorb > 0) {
@@ -344,13 +346,20 @@ public class HealthBarRenderer {
 					//Reset back to normal settings
 					GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 					mc.getTextureManager().bindTexture(ICON_VANILLA);
+
+
 				}
 			}
 		}
 			GlStateManager.disableBlend();
 
 			//Revert our state back
-
+		GlStateManager.scale(textScale,textScale,1);
+		int index = (int)Math.ceil(health/20f);
+		int textOffset = mc.fontRenderer.getStringWidth(index+"x");
+		drawStringOnHUD(index + "x", xStart - textOffset - 2, yStart, Integer.decode(healthColorValues[Math.min(index-1,healthColorValues.length-1)]), (float)textScale);
+		GlStateManager.color(1, 1, 1, 1);
+		GlStateManager.scale(1,1,1);
 		mc.getTextureManager().bindTexture(ICON_VANILLA);
 		GuiIngameForge.left_height += 10;
 		if(absorb > 0) {
@@ -373,5 +382,11 @@ public class HealthBarRenderer {
 			else {GlStateManager.color(1.0F, 1.0F, 1.0F, POTION_ALPHA);
 				drawTexturedModalRect(x, y, 133, 0, 9, 9);}
 		}
+	}
+	public void drawStringOnHUD(String string, int xOffset, int yOffset, int color, float scale) {
+		if (!ModConfig.showIndex)return;
+		yOffset+=9*(1-scale);
+		xOffset+=9*(1-scale);
+		mc.fontRenderer.drawString(string, xOffset/scale, yOffset/scale, color, true);
 	}
 }

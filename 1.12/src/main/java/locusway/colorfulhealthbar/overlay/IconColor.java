@@ -18,6 +18,8 @@ public class IconColor
         Red = Blue = Green = Alpha = 1.0f;
     }
 
+    public static final Pattern colorPattern = Pattern.compile("^#[0-9A-Fa-f]{6}$");
+
     /*
         Convert from #RRGGBB format.
         If string is not in correct format this function will set the color to black
@@ -25,7 +27,6 @@ public class IconColor
     public void setColorFromHex(String colorHex)
     {
         //Check the color hex is valid
-        Pattern colorPattern = Pattern.compile("^#[0-9A-Fa-f]{6}$");
         Matcher matcher = colorPattern.matcher(colorHex);
         if (matcher.matches())
         {

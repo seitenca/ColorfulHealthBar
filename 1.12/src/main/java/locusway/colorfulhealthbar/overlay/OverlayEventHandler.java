@@ -21,19 +21,10 @@ public class OverlayEventHandler
         int scaledWidth = event.getResolution().getScaledWidth();
         int scaledHeight = event.getResolution().getScaledHeight();
 
-        switch (event.getType())
-        {
-
-            case HEALTH:
-                {
-                    healthBarRenderer.renderHealthBar(scaledWidth, scaledHeight);
-                    /* Don't render the vanilla health bar */
-                    event.setCanceled(true);
-                }
-                break;
-
-            default:
-                break;
+        /* Don't render the vanilla health bar */
+        if (event.getType() == RenderGameOverlayEvent.ElementType.HEALTH) {
+            healthBarRenderer.renderHealthBar(scaledWidth, scaledHeight);
+            event.setCanceled(true);
         }
     }
 }
