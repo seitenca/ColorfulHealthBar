@@ -38,7 +38,7 @@ repositories {
     }
 }
 
-version = "0.0.2"
+version = "0.0.3"
 group= "tfar.colorfulhealthbar"
 archivesBaseName = "colorfulhealthbar"
 

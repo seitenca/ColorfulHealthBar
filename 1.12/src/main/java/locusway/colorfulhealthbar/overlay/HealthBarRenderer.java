@@ -355,7 +355,7 @@ public class HealthBarRenderer {
 
 			//Revert our state back
 		GlStateManager.scale(textScale,textScale,1);
-		int index = (int)Math.ceil(health/20f);
+		int index = (int)Math.max(Math.ceil(health/20f),1);
 		int textOffset = mc.fontRenderer.getStringWidth(index+"x");
 		drawStringOnHUD(index + "x", xStart - textOffset - 2, yStart, Integer.decode(healthColorValues[Math.min(index-1,healthColorValues.length-1)]), (float)textScale);
 		GlStateManager.color(1, 1, 1, 1);
