@@ -37,14 +37,7 @@ public class ColorfulHealthBar
 @SubscribeEvent
     public void setup(final FMLCommonSetupEvent event)
     {
-      /*  if (Loader.isModLoaded("mantle")) {
-            logger.info("Unregistering Mantle health renderer.");
-            Field f = EventBus::class.java.getDeclaredField("listeners");
-            f.setAccessible(true);
-            val listeners = f.get(MinecraftForge.EVENT_BUS) as ConcurrentHashMap<*, *>
-            val handler = listeners.keys.firstOrNull { it.javaClass.canonicalName == "slimeknights.mantle.client.ExtraHeartRenderHandler" }
-            if (handler == null) LOGGER.warn("Unable to unregister Mantle health renderer!")
-            else MinecraftForge.EVENT_BUS.unregister(handler) */
+
         proxy.postInit(event);
     }
 }

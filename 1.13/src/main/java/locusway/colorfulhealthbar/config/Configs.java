@@ -1,7 +1,6 @@
 package locusway.colorfulhealthbar.config;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.commons.lang3.tuple.Pair;
@@ -34,7 +33,7 @@ public class Configs {
             healthColorValues = builder
                     .comment("Colors must be specified in #RRGGBB format")
                     .translation("text.colorfulhealthbar.config.health")
-                    .defineList("health color values", Lists.newArrayList("#FF1313", "#FF7713", "#FFFF00","#13FF13","#13FFFF","#3030FF", "#7720FF"), o -> o instanceof String);
+                    .defineList("health color values", Lists.newArrayList("#FF1313", "#EE8100", "#E5CE00","#00DA00","#0C9DF1","#B486FF", "#EC8AFB","#FBD78B","#03EFEC","#B7E7FD","#EDEDED"), o -> o instanceof String);
             absorptionColorValues = builder
                     .comment("Colors must be specified in #RRGGBB format")
                     .translation("text.colorfulhealthbar.config.absorption")
