@@ -16,6 +16,9 @@ public class ModConfig {
     @Config.Name("Display number of health bars?")
     public static boolean showIndex = true;
 
+  @Config.Name("Display number of absorption bars?")
+  public static boolean showAbsorptionIndex = true;
+
   @Config.Name("Text scale")
   @Config.RangeDouble(min = 0,max = 1)
   public static double textScale = .75;
