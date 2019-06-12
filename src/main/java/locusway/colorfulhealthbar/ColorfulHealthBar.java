@@ -3,10 +3,8 @@ package locusway.colorfulhealthbar;
 import locusway.colorfulhealthbar.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.Logger;
 
 @Mod(modid = ColorfulHealthBar.MODID, name = ColorfulHealthBar.MODNAME, version = ColorfulHealthBar.MODVERSION, useMetadata = true, clientSideOnly = true)
 public class ColorfulHealthBar
@@ -22,17 +20,17 @@ public class ColorfulHealthBar
     @Mod.Instance
     public static ColorfulHealthBar instance;
 
-    public static Logger logger;
+  //  public static Logger logger;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-        logger = event.getModLog();
+   //     logger = event.getModLog();
 
         if(ModConfig.healthColorValues.length == 0)
         {
-            logger.error("Config error! No health colors specified in config");
-			logger.error("Health bar will not display correctly.");
+      //      logger.error("Config error! No health colors specified in config");
+	//		logger.error("Health bar will not display correctly.");
         }
 
     }

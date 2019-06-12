@@ -1,7 +1,7 @@
 package locusway.colorfulhealthbar.proxy;
 
 import locusway.colorfulhealthbar.ColorfulHealthBar;
-import locusway.colorfulhealthbar.EventConfigChanged;
+import locusway.colorfulhealthbar.EventConfigChange;
 import locusway.colorfulhealthbar.overlay.HealthBarRenderer;
 import locusway.colorfulhealthbar.overlay.OverlayEventHandler;
 import net.minecraft.client.Minecraft;
@@ -29,7 +29,7 @@ public class ClientProxy extends CommonProxy
         MinecraftForge.EVENT_BUS.register(overlay);
 
         //Register event for configuration change
-        EventConfigChanged eventConfigChanged = new EventConfigChanged();
+        EventConfigChange eventConfigChanged = new EventConfigChange();
         MinecraftForge.EVENT_BUS.register(eventConfigChanged);
     }
 

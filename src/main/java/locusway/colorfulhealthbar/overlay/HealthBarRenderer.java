@@ -70,7 +70,10 @@ public class HealthBarRenderer {
 		updateCounter = mc.ingameGUI.getUpdateCounter();
 
 		EntityPlayer entityplayer = (EntityPlayer) mc.getRenderViewEntity();
-		int health = MathHelper.ceil(entityplayer.getHealth());
+		IAttributeInstance maxHealthAttribute = entityplayer.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
+		float maxHealth = (float)Math.ceil(maxHealthAttribute.getAttributeValue());
+		int health = MathHelper.ceil(Math.min(entityplayer.getHealth(),maxHealth));
+
 		boolean highlight = healthUpdateCounter > (long) updateCounter && (healthUpdateCounter - (long) updateCounter) / 3L % 2L == 1L;
 
 		if (health < playerHealth && entityplayer.hurtResistantTime > 0) {
@@ -87,7 +90,7 @@ public class HealthBarRenderer {
 			lastSystemTime = Minecraft.getSystemTime();
 		}
 		int absorb = MathHelper.ceil(entityplayer.getAbsorptionAmount());
-		if (health != playerHealth || absorbIcons == null || healthIcons == null || forceUpdateIcons) {
+		if (health != playerHealth || absorbIcons == null || healthIcons == null ||forceUpdateIcons) {
 			healthIcons = IconStateCalculator.calculateIcons(health, healthColorValues);
 			absorbIcons = IconStateCalculator.calculateIcons(absorb, ModConfig.absorptionColorValues);
 			forceUpdateIcons = false;
@@ -96,10 +99,9 @@ public class HealthBarRenderer {
 		playerHealth = health;
 		int j = lastPlayerHealth;
 		rand.setSeed((long) (updateCounter * 312871));
-		IAttributeInstance maxHealthAttribute = entityplayer.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
 		int xStart = screenWidth / 2 - 91;
 		int yStart = screenHeight - 39;
-		float maxHealth = (float) maxHealthAttribute.getAttributeValue();
+		maxHealth = (float) maxHealthAttribute.getAttributeValue();
 		int numberOfHealthBars = Math.min(MathHelper.ceil((maxHealth + (float) absorb) / 20.0F),2);
 		int i2 = Math.max(10 - (numberOfHealthBars - 2), 3);
 		int regen = -1;
@@ -357,7 +359,7 @@ public class HealthBarRenderer {
 		GlStateManager.scale(textScale,textScale,1);
 		int index = (int)Math.max(Math.ceil(health/20f),1);
 		int textOffset = mc.fontRenderer.getStringWidth(index+"x");
-		drawStringOnHUD(index + "x", xStart - textOffset - 2, yStart, Integer.decode(healthColorValues[Math.min(index-1,healthColorValues.length-1)]), (float)textScale);
+		drawStringOnHUD(index + "x", xStart - textOffset - 1, yStart, Integer.decode(healthColorValues[Math.min(index-1,healthColorValues.length-1)]), (float)textScale);
 		GlStateManager.color(1, 1, 1, 1);
 		GlStateManager.scale(1,1,1);
 		mc.getTextureManager().bindTexture(ICON_VANILLA);

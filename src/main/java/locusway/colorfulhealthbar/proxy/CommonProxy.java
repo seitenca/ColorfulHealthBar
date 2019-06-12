@@ -10,6 +10,7 @@ public class CommonProxy
 
     public void postInit(FMLPostInitializationEvent event)
     {
+
     }
 
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)

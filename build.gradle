@@ -32,13 +32,9 @@ repositories {
         name 'tterrag maven'
         url "http://maven.tterrag.com/"
     }
-    maven {
-        name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
-    }
 }
 
-version = "0.0.3"
+version = "0.0.3a"
 group= "tfar.colorfulhealthbar"
 archivesBaseName = "colorfulhealthbar"
 
