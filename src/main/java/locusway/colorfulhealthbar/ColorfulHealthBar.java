@@ -1,51 +1,43 @@
 package locusway.colorfulhealthbar;
 
+import locusway.colorfulhealthbar.config.Configs;
+import locusway.colorfulhealthbar.proxy.ClientProxy;
 import locusway.colorfulhealthbar.proxy.CommonProxy;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@Mod(modid = ColorfulHealthBar.MODID, name = ColorfulHealthBar.MODNAME, version = ColorfulHealthBar.MODVERSION, useMetadata = true, clientSideOnly = true)
+@Mod(value = ColorfulHealthBar.MODID)
 public class ColorfulHealthBar
 {
-
     public static final String MODID = "colorfulhealthbar";
-    public static final String MODNAME = "Colorful Health Bar";
-    public static final String MODVERSION = "@VERSION@";
 
-    @SidedProxy(clientSide = "locusway.colorfulhealthbar.proxy.ClientProxy", serverSide = "locusway.colorfulhealthbar.proxy.ServerProxy")
-    public static CommonProxy proxy;
+    public static Logger logger = LogManager.getLogger();
 
-    @Mod.Instance
-    public static ColorfulHealthBar instance;
-
-  //  public static Logger logger;
-
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
-   //     logger = event.getModLog();
-
-        if(ModConfig.healthColorValues.length == 0)
-        {
-      //      logger.error("Config error! No health colors specified in config");
-	//		logger.error("Health bar will not display correctly.");
-        }
+    public ColorfulHealthBar() {
+        ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, Configs.CLIENT_SPEC);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::bakeConfigs);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
 
     }
+    public static CommonProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
 
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event)
+    public void bakeConfigs(ModConfig.ModConfigEvent event)
     {
-      /*  if (Loader.isModLoaded("mantle")) {
-            logger.info("Unregistering Mantle health renderer.");
-            Field f = EventBus::class.java.getDeclaredField("listeners");
-            f.setAccessible(true);
-            val listeners = f.get(MinecraftForge.EVENT_BUS) as ConcurrentHashMap<*, *>
-            val handler = listeners.keys.firstOrNull { it.javaClass.canonicalName == "slimeknights.mantle.client.ExtraHeartRenderHandler" }
-            if (handler == null) LOGGER.warn("Unable to unregister Mantle health renderer!")
-            else MinecraftForge.EVENT_BUS.unregister(handler) */
+        if (event.getConfig().getSpec() == Configs.CLIENT_SPEC)
+            Configs.bake();
+    }
+
+@SubscribeEvent
+    public void setup(final FMLCommonSetupEvent event)
+    {
+
         proxy.postInit(event);
     }
 }

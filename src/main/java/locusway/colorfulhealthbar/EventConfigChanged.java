@@ -3,7 +3,7 @@ package locusway.colorfulhealthbar;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 
-public class EventConfigChange
+public class EventConfigChanged
 {
     @SubscribeEvent
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)

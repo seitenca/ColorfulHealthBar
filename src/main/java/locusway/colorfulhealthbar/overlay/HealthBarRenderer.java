@@ -1,21 +1,22 @@
 package locusway.colorfulhealthbar.overlay;
 
 import locusway.colorfulhealthbar.ColorfulHealthBar;
-import locusway.colorfulhealthbar.ModConfig;
+import locusway.colorfulhealthbar.config.Configs;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.IngameGui;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.GuiIngameForge;
+import net.minecraftforge.client.ForgeIngameGui;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
-import static locusway.colorfulhealthbar.ModConfig.*;
+import static com.mojang.blaze3d.platform.GlStateManager.*;
+import static locusway.colorfulhealthbar.config.Configs.*;
 
 /*
     Class handles the drawing of the health bar
@@ -35,9 +36,9 @@ public class HealthBarRenderer {
 
   private static final ResourceLocation ICON_HEARTS = new ResourceLocation(ColorfulHealthBar.MODID, "textures/gui/health.png");
   private static final ResourceLocation ICON_ABSORPTION = new ResourceLocation(ColorfulHealthBar.MODID, "textures/gui/absorption.png");
-  private static final ResourceLocation ICON_VANILLA = Gui.ICONS;
+  private static final ResourceLocation ICON_VANILLA = IngameGui.GUI_ICONS_LOCATION;
 
-  private static final float PASS_ONE_ALPHA = 1;
+  private static final float PASS_ONE_ALPHA = 1.0F;
   private static final float PASS_TWO_ALPHA = 0.2647F;// 0.2645 - 0.2649 needs tweaking too much red, too little green/blue
   private static final float PASS_THREE_ALPHA = 0.769F;//exact
   private static final float PASS_FOUR_ALPHA = 0.63F;//< 0.66
@@ -48,7 +49,7 @@ public class HealthBarRenderer {
   private boolean forceUpdateIcons = false;
 
   public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height) {
-    mc.ingameGUI.drawTexturedModalRect(x, y, textureX, textureY, width, height);
+    Minecraft.getInstance().ingameGUI.blit(x, y, textureX, textureY, width, height);
   }
 
   public HealthBarRenderer(Minecraft mc) {
@@ -61,67 +62,66 @@ public class HealthBarRenderer {
 
   public void renderHealthBar(int screenWidth, int screenHeight) {
     //Push to avoid lasting changes
-    GlStateManager.pushMatrix();
-    GlStateManager.enableBlend();
+    pushMatrix();
+    enableBlend();
 
-    updateCounter = mc.ingameGUI.getUpdateCounter();
+    updateCounter = mc.ingameGUI.getTicks();//get update counter
 
-    EntityPlayer entityplayer = (EntityPlayer) mc.getRenderViewEntity();
-    IAttributeInstance maxHealthAttribute = entityplayer.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
-    double maxHealth = Math.ceil(maxHealthAttribute.getAttributeValue());
-    int health = MathHelper.ceil(Math.min(entityplayer.getHealth(), maxHealth));
-
+    PlayerEntity player = (PlayerEntity) mc.getRenderViewEntity();
+    int health = MathHelper.ceil(player.getHealth());
     boolean highlight = healthUpdateCounter > (long) updateCounter && (healthUpdateCounter - (long) updateCounter) / 3L % 2L == 1L;
 
-    if (health < playerHealth && entityplayer.hurtResistantTime > 0) {
-      lastSystemTime = Minecraft.getSystemTime();
+    if (health < playerHealth && player.hurtResistantTime > 0) {
+      lastSystemTime = System.currentTimeMillis();
       healthUpdateCounter = (long) (updateCounter + 20);
-    } else if (health > playerHealth && entityplayer.hurtResistantTime > 0) {
-      lastSystemTime = Minecraft.getSystemTime();
+    } else if (health > playerHealth && player.hurtResistantTime > 0) {
+      lastSystemTime = System.currentTimeMillis();
       healthUpdateCounter = (long) (updateCounter + 10);
     }
 
-    if (Minecraft.getSystemTime() - lastSystemTime > 1000L) {
+    if (System.currentTimeMillis() - lastSystemTime > 1000L) {
       playerHealth = health;
       lastPlayerHealth = health;
-      lastSystemTime = Minecraft.getSystemTime();
+      lastSystemTime = System.currentTimeMillis();
     }
-    int absorb = MathHelper.ceil(entityplayer.getAbsorptionAmount());
+    int absorb = MathHelper.ceil(player.getAbsorptionAmount());
     if (health != playerHealth || absorbIcons == null || healthIcons == null || forceUpdateIcons) {
-      healthIcons = IconStateCalculator.calculateIcons(health, healthColorValues);
-      absorbIcons = IconStateCalculator.calculateIcons(absorb, ModConfig.absorptionColorValues);
+      healthIcons = IconStateCalculator.calculateIcons(health, Configs.healthColorValues);
+      absorbIcons = IconStateCalculator.calculateIcons(absorb, Configs.absorptionColorValues);
       forceUpdateIcons = false;
     }
 
     playerHealth = health;
     int j = lastPlayerHealth;
     rand.setSeed((long) (updateCounter * 312871));
+    IAttributeInstance maxHealthAttribute = player.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
     int xStart = screenWidth / 2 - 91;
     int yStart = screenHeight - 39;
-    maxHealth = maxHealthAttribute.getAttributeValue();
-    int numberOfHealthBars = Math.min(MathHelper.ceil((maxHealth + absorb) / 20), 2);
+    double maxHealth = maxHealthAttribute.getValue();
+    int numberOfHealthBars = MathHelper.ceil((maxHealth + absorb) / 20.0F);
     int i2 = Math.max(10 - (numberOfHealthBars - 2), 3);
     int regen = -1;
 
-    if (entityplayer.isPotionActive(MobEffects.REGENERATION))
+    if (player.isPotionActive(Effects.REGENERATION))
       regen = updateCounter % MathHelper.ceil(maxHealth + 5.0F);
 
-    mc.mcProfiler.startSection("health");
+    mc.getProfiler().startSection("health");
 
     for (int i = 9; i >= 0; --i) {
-      healthIcons = IconStateCalculator.calculateIcons(health, healthColorValues);
+      healthIcons = IconStateCalculator.calculateIcons(health, Configs.healthColorValues
+      );
       Icon icon = healthIcons[i];
       IconColor firstHalfColor = icon.primaryIconColor;
       IconColor secondHalfColor = icon.secondaryIconColor;
 
       int k5 = 16;
 
-      if (entityplayer.isPotionActive(MobEffects.POISON)) k5 += 36;
-      else if (entityplayer.isPotionActive(MobEffects.WITHER)) k5 += 72;
+      if (player.isPotionActive(Effects.POISON)) k5 += 36;
+      else if (player.isPotionActive(Effects.WITHER)) k5 += 72;
 
       int i4 = (highlight) ? 1 : 0;
 
-      int j4 = MathHelper.ceil((i + 1) / 10f) - 1;
+      int j4 = MathHelper.ceil((float) (i + 1) / 10.0F) - 1;
       int xPosition = xStart + i % 10 * 8;
       int yPosition = yStart - j4 * i2;
 
@@ -129,7 +129,7 @@ public class HealthBarRenderer {
 
       if (absorb <= 0 && i == regen) yPosition -= 2;
 
-      int i5 = (entityplayer.world.getWorldInfo().isHardcoreModeEnabled()) ? 5 : 0;
+      int i5 = (player.world.getWorldInfo().isHardcore()) ? 5 : 0;
 
       //Heart background
       drawTexturedModalRect(xPosition, yPosition, 16 + i4 * 9, 9 * i5, 9, 9);
@@ -154,25 +154,25 @@ public class HealthBarRenderer {
         mc.getTextureManager().bindTexture(ICON_HEARTS);
 
         //Draw tinted white heart
-        GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+        color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
         drawTexturedModalRect(xPosition, yPosition, 0, 0, 9, 9);
 
         //Second pass dark highlights
-        GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+        color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
         drawTexturedModalRect(xPosition, yPosition, 0, 9, 9, 9);
 
         if (i5 == 5) {
-          GlStateManager.color(1, 1, 1, PASS_FOUR_ALPHA);
+          color4f(1, 1, 1, PASS_FOUR_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 0, 18, 9, 9);
         } else {
-          GlStateManager.color(1, 1, 1, PASS_THREE_ALPHA);
+          color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 27, 0, 9, 9);
         }
 
         //Reset back to normal settings
         mc.getTextureManager().bindTexture(ICON_VANILLA);
         if (k5 != 16) potionEffects(xPosition, yPosition, k5, i, health);
-        GlStateManager.color(1, 1, 1, 1);
+        color4f(1.0F, 1.0F, 1.0F, 1.0F);
       }
 
       //if (i * 2 + 1 == health)
@@ -186,34 +186,34 @@ public class HealthBarRenderer {
           mc.getTextureManager().bindTexture(ICON_HEARTS);
 
           //Draw first half of tinted white heart
-          GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 9, 0, 9, 9);
 
           //Second pass dark highlights
-          GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 9, 9, 9, 9);
 
           if (i5 == 5) {
-            GlStateManager.color(1, 1, 1, PASS_FOUR_ALPHA);
+            color4f(1, 1, 1, PASS_FOUR_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 0, 18, 9, 9);
           } else {
-            GlStateManager.color(1, 1, 1, PASS_THREE_ALPHA);
+            color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 27, 0, 9, 9);
           }
 
           //Draw second half of tinted white heart
-          GlStateManager.color(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_ONE_ALPHA);
+          color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_ONE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 18, 0, 9, 9);
 
           //Second pass dark highlights
-          GlStateManager.color(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_TWO_ALPHA);
+          color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_TWO_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 18, 9, 9, 9);
 
           if (i5 == 5) {
-            GlStateManager.color(1, 1, 1, PASS_FOUR_ALPHA);
+            color4f(1, 1, 1, PASS_FOUR_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 0, 18, 9, 9);
           } else {
-            GlStateManager.color(1, 1, 1, PASS_THREE_ALPHA);
+            color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 27, 0, 9, 9);
           }
         } else {
@@ -223,18 +223,18 @@ public class HealthBarRenderer {
           mc.getTextureManager().bindTexture(ICON_HEARTS);
 
           //Draw tinted white heart
-          GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 9, 0, 9, 9);
 
           //Second pass dark highlights
-          GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 9, 9, 9, 9);
 
           if (i5 == 5) {
-            GlStateManager.color(1, 1, 1, PASS_FOUR_ALPHA);
+            color4f(1, 1, 1, PASS_FOUR_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 9, 18, 9, 9);
           } else {
-            GlStateManager.color(1, 1, 1, PASS_THREE_ALPHA);
+            color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 27, 0, 9, 9);
           }
         }
@@ -242,29 +242,34 @@ public class HealthBarRenderer {
         //Reset back to normal settings
         mc.getTextureManager().bindTexture(ICON_VANILLA);
         if (k5 != 16) potionEffects(xPosition, yPosition, k5, i, health);
-        GlStateManager.color(1, 1, 1, 1);
+        color4f(1.0F, 1.0F, 1.0F, 1.0F);
+
       }
     }
     if (absorb > 0) {
       for (int i = 9; i >= 0; i--) {
-        if (absorb / 2 < i) continue;
+        if ((absorb / 2) < i) continue;
         int absorbCap = absorb % 20;
         int offset = 10;
         Icon icon2 = absorbIcons[i];
-        absorbIcons = IconStateCalculator.calculateIcons(absorb, ModConfig.absorptionColorValues);
+        absorbIcons = IconStateCalculator.calculateIcons(absorb, Configs.absorptionColorValues);
         IconColor firstHalfColor = icon2.primaryIconColor;
         IconColor secondHalfColor = icon2.secondaryIconColor;
 
-        if (entityplayer.isPotionActive(MobEffects.POISON)) ;
-        else if (entityplayer.isPotionActive(MobEffects.WITHER)) ;
+        int k5 = 16;
 
-        int j4 = MathHelper.ceil((i + 1) / 10f) - 1;
+        if (player.isPotionActive(Effects.POISON)) k5 += 36;
+        else if (player.isPotionActive(Effects.WITHER)) k5 += 72;
+
+        int i4 = (highlight) ? 1 : 0;
+
+        int j4 = MathHelper.ceil((float) (i + 1) / 10.0F) - 1;
         int xPosition = xStart + i % 10 * 8;
         int yPosition = yStart - j4 * i2;
 
         //if (health <= 4) yPosition += .rand.nextInt(2);
 
-        int i5 = (entityplayer.world.getWorldInfo().isHardcoreModeEnabled()) ? 5 : 0;
+        int i5 = (player.world.getWorldInfo().isHardcore()) ? 5 : 0;
 
         //Heart background
         //drawTexturedModalRect(xPosition, yPosition-offset, 16 + i4 * 9, 9 * i5, 9, 9);
@@ -277,19 +282,19 @@ public class HealthBarRenderer {
           mc.getTextureManager().bindTexture(ICON_ABSORPTION);
 
           //Draw tinted white absorption heart
-          GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition - offset, 0, 0, 9, 9);
 
           //Second pass dark highlights
-          GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
           drawTexturedModalRect(xPosition, yPosition - offset, 0, 9, 9, 9);
 
           //Third pass dot highlight
-          GlStateManager.color(1, 1, 1, PASS_SIX_ALPHA);
+          color4f(1.0F, 1.0F, 1.0F, PASS_SIX_ALPHA);
           drawTexturedModalRect(xPosition, yPosition - offset, 27, 0, 9, 9);
 
           //Reset back to normal settings
-          GlStateManager.color(1, 1, 1, 1);
+          color4f(1.0F, 1.0F, 1.0F, 1.0F);
           mc.getTextureManager().bindTexture(ICON_VANILLA);
         }
         //if (i * 2 + 1 == absorb)
@@ -301,23 +306,23 @@ public class HealthBarRenderer {
             mc.getTextureManager().bindTexture(ICON_ABSORPTION);
 
             //Draw first half of tinted white heart
-            GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+            color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 9, 0, 9, 9);
 
             //Second pass dark highlights
-            GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+            color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 9, 9, 9, 9);
 
             //Third pass dot highlight
-            GlStateManager.color(1, 1, 1, PASS_SIX_ALPHA);
+            color4f(1.0F, 1.0F, 1.0F, PASS_SIX_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 27, 0, 9, 9);
 
             //Draw second half of tinted white heart
-            GlStateManager.color(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_ONE_ALPHA);
+            color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_ONE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 18, 0, 9, 9);
 
             //Second pass dark highlights
-            GlStateManager.color(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_TWO_ALPHA);
+            color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_TWO_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 18, 9, 9, 9);
           } else {
             //Draw only first half of heart
@@ -326,70 +331,94 @@ public class HealthBarRenderer {
             mc.getTextureManager().bindTexture(ICON_ABSORPTION);
 
             //Draw tinted white heart
-            GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+            color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 9, 0, 9, 9);
 
             //Second pass dark highlights
-            GlStateManager.color(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+            color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 9, 9, 9, 9);
 
             //third pass dot highlight
-            GlStateManager.color(1, 1, 1, PASS_SIX_ALPHA);
+            color4f(1.0F, 1.0F, 1.0F, PASS_SIX_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 27, 0, 9, 9);
           }
 
           //Reset back to normal settings
-          GlStateManager.color(1, 1, 1, 1);
+          color4f(1.0F, 1.0F, 1.0F, 1.0F);
+
           mc.getTextureManager().bindTexture(ICON_VANILLA);
-
-
         }
       }
     }
-    GlStateManager.disableBlend();
-
-    //Revert our state back
-    GlStateManager.scale(textScale, textScale, 1);
-    int index = (int) Math.max(Math.ceil(health / 20f), 1);
-    int textOffset = mc.fontRenderer.getStringWidth(index + "x");
-    if (ModConfig.showIndex) drawStringOnHUD(index + "x", xStart - textOffset - 1, yStart, Integer.decode(healthColorValues[Math.min(index - 1, healthColorValues.length - 1)]), (float) textScale);
-    if (absorb > 0 && showAbsorptionIndex)drawStringOnHUD((int)Math.ceil(absorb/20d) + "x", xStart - textOffset - 1, yStart - 10, Integer.decode(absorptionColorValues[Math.min((int)Math.ceil(absorb/20d) - 1, absorptionColorValues.length - 1)]), (float) textScale);
-    GlStateManager.color(1, 1, 1, 1);
-    GlStateManager.scale(1, 1, 1);
-    mc.getTextureManager().bindTexture(ICON_VANILLA);
-    GuiIngameForge.left_height += 10;
+    ForgeIngameGui.left_height += 10;
     if (absorb > 0) {
-      GuiIngameForge.left_height += 10;
+      ForgeIngameGui.left_height += 10;
     }
 
-    GlStateManager.popMatrix();
-    mc.mcProfiler.endSection();
+
+    disableBlend();
+
+    //Revert our state back
+    //Revert our state back
+    scaled(textScale, textScale, 1);
+    int index = (int) Math.max(Math.ceil(health / 20f), 1);
+    String[] info = getInfo(health, (int) maxHealth, absorb);
+    if (info != null) {
+      int textOffset = mc.fontRenderer.getStringWidth(info[0]);
+      drawStringOnHUD(info[0], xStart - textOffset + 3, yStart, Integer.decode(healthColorValues.get(Math.min(index - 1, healthColorValues.size() - 1))), textScale);
+      if (absorb > 0) {
+        textOffset = mc.fontRenderer.getStringWidth(info[1]);
+        drawStringOnHUD(info[1], xStart - textOffset - 1, yStart - 10, Integer.decode(absorptionColorValues.get(Math.min((int) Math.ceil(absorb / 20d) - 1, absorptionColorValues.size() - 1))), textScale);
+      }
+    }
+    color4f(1, 1, 1, 1);
+    scaled(1, 1, 1);
+    mc.getTextureManager().bindTexture(ICON_VANILLA);
+    if (absorb > 0) {
+      ForgeIngameGui.left_height += 10;
+    }
+    popMatrix();
+    mc.getProfiler().endSection();
   }
 
   public void potionEffects(int x, int y, int k5, int i, int health) {
     if (k5 == 52) {
       if (i * 2 + 1 != health || health >= 20) {
-        GlStateManager.color(1, 1, 1, POTION_ALPHA);
+        color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
         drawTexturedModalRect(x, y, 88, 0, 9, 9);
       } else {
-        GlStateManager.color(1, 1, 1, POTION_ALPHA);
+        color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
         drawTexturedModalRect(x, y, 97, 0, 9, 9);
       }
     }
     if (k5 == 88) {
       if (i * 2 + 1 != health || health >= 20) {
-        GlStateManager.color(1, 1, 1, POTION_ALPHA);
+        color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
         drawTexturedModalRect(x, y, 124, 0, 9, 9);
       } else {
-        GlStateManager.color(1, 1, 1, POTION_ALPHA);
+        color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
         drawTexturedModalRect(x, y, 133, 0, 9, 9);
       }
     }
   }
 
-  public void drawStringOnHUD(String string, int xOffset, int yOffset, int color, float scale) {
+  @Nullable
+  public String[] getInfo(int health, int maxHealth, int absorption) {
+    switch (infoLevel) {
+      case NONE:
+        return null;
+      case BARS:
+        return new String[]{(int) Math.max(Math.ceil(health / 20d), 1) + "x", (int) Math.max(Math.ceil(absorption / 20d), 1) + "x"};
+      case ALL:
+      default:
+        return new String[]{health/2 + "/" + maxHealth/2, absorption/2 + ""};
+    }
+  }
+
+  public void drawStringOnHUD(String string, int xOffset, int yOffset, int color, double scale) {
+    if (infoLevel == InfoLevel.NONE) return;
     yOffset += 9 * (1 - scale);
     xOffset += 9 * (1 - scale);
-    mc.fontRenderer.drawString(string, xOffset / scale, yOffset / scale, color, true);
+    mc.fontRenderer.drawStringWithShadow(string, xOffset / (float) scale, yOffset / (float) scale, color);
   }
 }

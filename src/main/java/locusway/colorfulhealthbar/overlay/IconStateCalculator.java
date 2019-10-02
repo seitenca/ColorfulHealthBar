@@ -1,32 +1,29 @@
 package locusway.colorfulhealthbar.overlay;
 
+
+import java.util.List;
+
 /*
     Class manages the calculations required to determine the correct color(s) to use
  */
 public class IconStateCalculator
 {
-    private static void setIconColor(Icon icon, String[] colors, int scale, int value)
+    private static void setIconColor(Icon icon, List<? extends String> colors, int scale, int value)
     {
         int currentScale = scale;
         int previousScale = scale - 1;
 
-        //Ensure we always have a color on the list
-        if(colors.length == 0)
-        {
-            colors = new String[] {"#FFFFFF"};
-        }
-
         //Force last color if we have run out of colors on the list
-        if (currentScale > colors.length - 1)
+        if (currentScale > colors.size() - 1)
         {
-            currentScale = colors.length - 1;
+            currentScale = colors.size() - 1;
         }
-        if(previousScale > colors.length - 1)
+        if(previousScale > colors.size() - 1)
         {
-            previousScale = colors.length - 1;
+            previousScale = colors.size() - 1;
         }
 
-        //Previous scale is -1 between 0 and 20 points of armor, so reset to 0 for sane value
+        //Previous scale is -1 between 0 and 20 points of health, so reset to 0 for sane value
         if (previousScale < 0)
         {
             previousScale = 0;
@@ -36,24 +33,24 @@ public class IconStateCalculator
         if (value >= 1)
         {
             //Should be current tier color
-            icon.primaryIconColor.setColorFromHex(colors[currentScale]);
+            icon.primaryIconColor.setColorFromHex(colors.get(currentScale));
         }
 
         //Covers 1 (HALF) - Secondary Color
         if (value == 1)
         {
             //Should be previous tier color
-            icon.secondaryIconColor.setColorFromHex(colors[previousScale]);
+            icon.secondaryIconColor.setColorFromHex(colors.get(previousScale));
         }
 
         if (value == 0)
         {
             //Should be previous tier color
-            icon.primaryIconColor.setColorFromHex(colors[previousScale]);
+            icon.primaryIconColor.setColorFromHex(colors.get(previousScale));
         }
     }
 
-    public static Icon[] calculateIcons(int playerHealthValue, String[] colors)
+    public static Icon[] calculateIcons(int playerHealthValue, List<? extends String> colors)
     {
         Icon[] icons = new Icon[10];
 

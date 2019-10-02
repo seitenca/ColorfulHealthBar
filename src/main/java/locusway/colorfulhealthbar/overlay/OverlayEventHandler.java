@@ -1,7 +1,8 @@
 package locusway.colorfulhealthbar.overlay;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /*
     Class which handles the render event and hides the vanilla armor bar
@@ -18,8 +19,9 @@ public class OverlayEventHandler
     @SubscribeEvent(receiveCanceled = true)
     public void onRenderGameOverlayEventPre(RenderGameOverlayEvent.Pre event)
     {
-        int scaledWidth = event.getResolution().getScaledWidth();
-        int scaledHeight = event.getResolution().getScaledHeight();
+        Minecraft mc = Minecraft.getInstance();
+        int scaledWidth = mc.mainWindow.getScaledWidth();
+        int scaledHeight = mc.mainWindow.getScaledHeight();
 
         /* Don't render the vanilla health bar */
         if (event.getType() == RenderGameOverlayEvent.ElementType.HEALTH) {
