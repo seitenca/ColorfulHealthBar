@@ -106,7 +106,7 @@ public class HealthBarRenderer {
     if (entityplayer.isPotionActive(MobEffects.REGENERATION))
       regen = updateCounter % MathHelper.ceil(maxHealth + 5.0F);
 
-    mc.mcProfiler.startSection("health");
+    mc.profiler.startSection("health");
 
     for (int i = 9; i >= 0; --i) {
       healthIcons = IconStateCalculator.calculateIcons(health, healthColorValues);
@@ -132,7 +132,7 @@ public class HealthBarRenderer {
       int i5 = (entityplayer.world.getWorldInfo().isHardcoreModeEnabled()) ? 5 : 0;
 
       //Heart background
-      drawTexturedModalRect(xPosition, yPosition, 16 + i4 * 9, 9 * i5, 9, 9);
+      if (i * 2 < maxHealth) drawTexturedModalRect(xPosition, yPosition, 16 + i4 * 9, 9 * i5, 9, 9);
 
       if (highlight) {
         if (i * 2 + 1 < j) {
@@ -363,7 +363,7 @@ public class HealthBarRenderer {
     }
 
     GlStateManager.popMatrix();
-    mc.mcProfiler.endSection();
+    mc.profiler.endSection();
   }
 
   public void potionEffects(int x, int y, int k5, int i, int health) {

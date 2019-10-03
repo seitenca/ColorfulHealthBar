@@ -34,7 +34,7 @@ repositories {
     }
 }
 
-version = "0.0.4"
+version = "0.0.4a"
 group= "tfar.colorfulhealthbar"
 archivesBaseName = "colorfulhealthbar"
 
@@ -42,9 +42,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.12.2-14.23.1.2555"
+    version = "1.12.2-14.23.5.2838"
     runDir = "run"
-    mappings = "snapshot_20171003"
+    mappings = "stable_39"
     useDepAts = true
 }
 
