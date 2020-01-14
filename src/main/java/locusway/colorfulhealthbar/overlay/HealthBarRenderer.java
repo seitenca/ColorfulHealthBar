@@ -1,5 +1,6 @@
 package locusway.colorfulhealthbar.overlay;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import locusway.colorfulhealthbar.ColorfulHealthBar;
 import locusway.colorfulhealthbar.config.Configs;
 import net.minecraft.client.Minecraft;
@@ -10,12 +11,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.ForgeIngameGui;
+import net.minecraftforge.client.gui.ForgeIngameGui;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
-import static com.mojang.blaze3d.platform.GlStateManager.*;
 import static locusway.colorfulhealthbar.config.Configs.*;
 
 /*
@@ -62,8 +62,8 @@ public class HealthBarRenderer {
 
   public void renderHealthBar(int screenWidth, int screenHeight) {
     //Push to avoid lasting changes
-    pushMatrix();
-    enableBlend();
+    RenderSystem.pushMatrix();
+    RenderSystem.enableBlend();
 
     updateCounter = mc.ingameGUI.getTicks();//get update counter
 
@@ -154,25 +154,25 @@ public class HealthBarRenderer {
         mc.getTextureManager().bindTexture(ICON_HEARTS);
 
         //Draw tinted white heart
-        color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+        RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
         drawTexturedModalRect(xPosition, yPosition, 0, 0, 9, 9);
 
         //Second pass dark highlights
-        color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+        RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
         drawTexturedModalRect(xPosition, yPosition, 0, 9, 9, 9);
 
         if (i5 == 5) {
-          color4f(1, 1, 1, PASS_FOUR_ALPHA);
+          RenderSystem.color4f(1, 1, 1, PASS_FOUR_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 0, 18, 9, 9);
         } else {
-          color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
+          RenderSystem.color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 27, 0, 9, 9);
         }
 
         //Reset back to normal settings
         mc.getTextureManager().bindTexture(ICON_VANILLA);
         if (k5 != 16) potionEffects(xPosition, yPosition, k5, i, health);
-        color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
       }
 
       //if (i * 2 + 1 == health)
@@ -186,34 +186,34 @@ public class HealthBarRenderer {
           mc.getTextureManager().bindTexture(ICON_HEARTS);
 
           //Draw first half of tinted white heart
-          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+          RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 9, 0, 9, 9);
 
           //Second pass dark highlights
-          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+          RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 9, 9, 9, 9);
 
           if (i5 == 5) {
-            color4f(1, 1, 1, PASS_FOUR_ALPHA);
+            RenderSystem.color4f(1, 1, 1, PASS_FOUR_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 0, 18, 9, 9);
           } else {
-            color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 27, 0, 9, 9);
           }
 
           //Draw second half of tinted white heart
-          color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_ONE_ALPHA);
+          RenderSystem.color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_ONE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 18, 0, 9, 9);
 
           //Second pass dark highlights
-          color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_TWO_ALPHA);
+          RenderSystem.color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_TWO_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 18, 9, 9, 9);
 
           if (i5 == 5) {
-            color4f(1, 1, 1, PASS_FOUR_ALPHA);
+            RenderSystem.color4f(1, 1, 1, PASS_FOUR_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 0, 18, 9, 9);
           } else {
-            color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 27, 0, 9, 9);
           }
         } else {
@@ -223,18 +223,18 @@ public class HealthBarRenderer {
           mc.getTextureManager().bindTexture(ICON_HEARTS);
 
           //Draw tinted white heart
-          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+          RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 9, 0, 9, 9);
 
           //Second pass dark highlights
-          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+          RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
           drawTexturedModalRect(xPosition, yPosition, 9, 9, 9, 9);
 
           if (i5 == 5) {
-            color4f(1, 1, 1, PASS_FOUR_ALPHA);
+            RenderSystem.color4f(1, 1, 1, PASS_FOUR_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 9, 18, 9, 9);
           } else {
-            color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, PASS_THREE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition, 27, 0, 9, 9);
           }
         }
@@ -242,7 +242,7 @@ public class HealthBarRenderer {
         //Reset back to normal settings
         mc.getTextureManager().bindTexture(ICON_VANILLA);
         if (k5 != 16) potionEffects(xPosition, yPosition, k5, i, health);
-        color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
       }
     }
@@ -282,19 +282,19 @@ public class HealthBarRenderer {
           mc.getTextureManager().bindTexture(ICON_ABSORPTION);
 
           //Draw tinted white absorption heart
-          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+          RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
           drawTexturedModalRect(xPosition, yPosition - offset, 0, 0, 9, 9);
 
           //Second pass dark highlights
-          color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+          RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
           drawTexturedModalRect(xPosition, yPosition - offset, 0, 9, 9, 9);
 
           //Third pass dot highlight
-          color4f(1.0F, 1.0F, 1.0F, PASS_SIX_ALPHA);
+          RenderSystem.color4f(1.0F, 1.0F, 1.0F, PASS_SIX_ALPHA);
           drawTexturedModalRect(xPosition, yPosition - offset, 27, 0, 9, 9);
 
           //Reset back to normal settings
-          color4f(1.0F, 1.0F, 1.0F, 1.0F);
+          RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
           mc.getTextureManager().bindTexture(ICON_VANILLA);
         }
         //if (i * 2 + 1 == absorb)
@@ -306,23 +306,23 @@ public class HealthBarRenderer {
             mc.getTextureManager().bindTexture(ICON_ABSORPTION);
 
             //Draw first half of tinted white heart
-            color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+            RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 9, 0, 9, 9);
 
             //Second pass dark highlights
-            color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+            RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 9, 9, 9, 9);
 
             //Third pass dot highlight
-            color4f(1.0F, 1.0F, 1.0F, PASS_SIX_ALPHA);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, PASS_SIX_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 27, 0, 9, 9);
 
             //Draw second half of tinted white heart
-            color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_ONE_ALPHA);
+            RenderSystem.color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_ONE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 18, 0, 9, 9);
 
             //Second pass dark highlights
-            color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_TWO_ALPHA);
+            RenderSystem.color4f(secondHalfColor.Red, secondHalfColor.Green, secondHalfColor.Blue, PASS_TWO_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 18, 9, 9, 9);
           } else {
             //Draw only first half of heart
@@ -331,20 +331,20 @@ public class HealthBarRenderer {
             mc.getTextureManager().bindTexture(ICON_ABSORPTION);
 
             //Draw tinted white heart
-            color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
+            RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_ONE_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 9, 0, 9, 9);
 
             //Second pass dark highlights
-            color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
+            RenderSystem.color4f(firstHalfColor.Red, firstHalfColor.Green, firstHalfColor.Blue, PASS_TWO_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 9, 9, 9, 9);
 
             //third pass dot highlight
-            color4f(1.0F, 1.0F, 1.0F, PASS_SIX_ALPHA);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, PASS_SIX_ALPHA);
             drawTexturedModalRect(xPosition, yPosition - offset, 27, 0, 9, 9);
           }
 
           //Reset back to normal settings
-          color4f(1.0F, 1.0F, 1.0F, 1.0F);
+          RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
           mc.getTextureManager().bindTexture(ICON_VANILLA);
         }
@@ -356,11 +356,11 @@ public class HealthBarRenderer {
     }
 
 
-    disableBlend();
+    RenderSystem.disableBlend();
 
     //Revert our state back
     //Revert our state back
-    scaled(textScale, textScale, 1);
+    RenderSystem.scaled(textScale, textScale, 1);
     int index = (int) Math.max(Math.ceil(health / 20f), 1);
     String[] info = getInfo(health, (int) maxHealth, absorb);
     if (info != null) {
@@ -371,32 +371,32 @@ public class HealthBarRenderer {
         drawStringOnHUD(info[1], xStart - textOffset - 1, yStart - 10, Integer.decode(absorptionColorValues.get(Math.min((int) Math.ceil(absorb / 20d) - 1, absorptionColorValues.size() - 1))), textScale);
       }
     }
-    color4f(1, 1, 1, 1);
-    scaled(1, 1, 1);
+    RenderSystem.color4f(1, 1, 1, 1);
+    RenderSystem.scaled(1, 1, 1);
     mc.getTextureManager().bindTexture(ICON_VANILLA);
     if (absorb > 0) {
       ForgeIngameGui.left_height += 10;
     }
-    popMatrix();
+    RenderSystem.popMatrix();
     mc.getProfiler().endSection();
   }
 
   public void potionEffects(int x, int y, int k5, int i, int health) {
     if (k5 == 52) {
       if (i * 2 + 1 != health || health >= 20) {
-        color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
         drawTexturedModalRect(x, y, 88, 0, 9, 9);
       } else {
-        color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
         drawTexturedModalRect(x, y, 97, 0, 9, 9);
       }
     }
     if (k5 == 88) {
       if (i * 2 + 1 != health || health >= 20) {
-        color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
         drawTexturedModalRect(x, y, 124, 0, 9, 9);
       } else {
-        color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, POTION_ALPHA);
         drawTexturedModalRect(x, y, 133, 0, 9, 9);
       }
     }

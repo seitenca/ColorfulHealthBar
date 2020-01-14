@@ -1,43 +1,36 @@
 package locusway.colorfulhealthbar;
 
 import locusway.colorfulhealthbar.config.Configs;
-import locusway.colorfulhealthbar.proxy.ClientProxy;
-import locusway.colorfulhealthbar.proxy.CommonProxy;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import locusway.colorfulhealthbar.overlay.HealthBarRenderer;
+import locusway.colorfulhealthbar.overlay.OverlayEventHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraftforge.fml.network.FMLNetworkConstants;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Mod(value = ColorfulHealthBar.MODID)
-public class ColorfulHealthBar
-{
-    public static final String MODID = "colorfulhealthbar";
+public class ColorfulHealthBar {
+  public static final String MODID = "colorfulhealthbar";
 
-    public static Logger logger = LogManager.getLogger();
+  public ColorfulHealthBar() {
+    DistExecutor.runWhenOn(Dist.CLIENT, () -> this::setup);
+  }
 
-    public ColorfulHealthBar() {
-        ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, Configs.CLIENT_SPEC);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::bakeConfigs);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+  public void bakeConfigs(ModConfig.ModConfigEvent event) {
+      Configs.bake();
+  }
 
-    }
-    public static CommonProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-
-    public void bakeConfigs(ModConfig.ModConfigEvent event)
-    {
-        if (event.getConfig().getSpec() == Configs.CLIENT_SPEC)
-            Configs.bake();
-    }
-
-@SubscribeEvent
-    public void setup(final FMLCommonSetupEvent event)
-    {
-
-        proxy.postInit(event);
-    }
+  public void setup(){
+    MinecraftForge.EVENT_BUS.register(new OverlayEventHandler(new HealthBarRenderer(Minecraft.getInstance())));
+    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::bakeConfigs);
+    ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+    ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.CLIENT, Configs.CLIENT_SPEC);
+  }
 }

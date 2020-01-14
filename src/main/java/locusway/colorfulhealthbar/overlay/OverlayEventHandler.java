@@ -20,8 +20,8 @@ public class OverlayEventHandler
     public void onRenderGameOverlayEventPre(RenderGameOverlayEvent.Pre event)
     {
         Minecraft mc = Minecraft.getInstance();
-        int scaledWidth = mc.mainWindow.getScaledWidth();
-        int scaledHeight = mc.mainWindow.getScaledHeight();
+        int scaledWidth = mc.func_228018_at_().getScaledWidth();
+        int scaledHeight = mc.func_228018_at_().getScaledHeight();
 
         /* Don't render the vanilla health bar */
         if (event.getType() == RenderGameOverlayEvent.ElementType.HEALTH) {
