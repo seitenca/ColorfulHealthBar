@@ -1,8 +1,6 @@
 package locusway.colorfulhealthbar.overlay;
 
-/*
-    Class manages the calculations required to determine the correct color(s) to use
- */
+//Class manages the calculations required to determine the correct color(s) to use
 public class IconStateCalculator
 {
     private static void setIconColor(Icon icon, String[] colors, int scale, int value)

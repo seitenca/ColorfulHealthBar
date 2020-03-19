@@ -1,8 +1,6 @@
 package locusway.colorfulhealthbar.overlay;
 
-/*
-    Class wraps the information required to draw an individual armor icon
- */
+//Class wraps the information required to draw an individual armor icon
 public class Icon
 {
     public Type iconType;

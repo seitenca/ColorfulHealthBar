@@ -3,9 +3,7 @@ package locusway.colorfulhealthbar.overlay;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
-    Class representing the color of the armor icon
- */
+//Class representing the color of the armor icon
 public class IconColor
 {
     public float Red;
